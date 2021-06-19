@@ -1,0 +1,87 @@
+plugins {
+  id 'org.springframework.boot' version '2.5.1'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+
+  id 'java'
+  id 'eclipse'
+}
+
+group = 'com.vaaaarlos'
+version = '0.0.1'
+sourceCompatibility = '16'
+
+configurations {
+  compileOnly { extendsFrom annotationProcessor }
+  cucumberRuntime { extendsFrom testImplementation }
+}
+
+repositories { mavenCentral() }
+
+ext {
+  springfoxBootStarterVersion   = '3.0.0'
+  mapstructVersion              = '1.4.2.Final'
+  lombokMapstructBindingVersion = '0.2.0'
+  cucumberVersion               = '6.10.4'
+}
+
+dependencies {
+  // spring
+  implementation "org.springframework.boot:spring-boot-starter"
+  implementation "org.springframework.boot:spring-boot-starter-actuator"
+  implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+  implementation "org.springframework.boot:spring-boot-starter-validation"
+  implementation "org.springframework.boot:spring-boot-starter-web"
+  developmentOnly "org.springframework.boot:spring-boot-devtools"
+
+  // utils
+  implementation "io.springfox:springfox-boot-starter:${springfoxBootStarterVersion}"
+  implementation "com.h2database:h2"
+
+  // annotation processor
+  compileOnly "org.projectlombok:lombok"
+  compileOnly "org.mapstruct:mapstruct:${mapstructVersion}"
+  annotationProcessor "org.projectlombok:lombok"
+  annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+  annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+
+  // cucumber
+  implementation "io.cucumber:cucumber-java:${cucumberVersion}"
+  implementation "io.cucumber:cucumber-spring:${cucumberVersion}"
+
+  // test
+  testImplementation "io.cucumber:cucumber-junit:${cucumberVersion}"
+  testImplementation "org.springframework.boot:spring-boot-starter-test"
+
+  // test annotation processor
+  testCompileOnly "org.projectlombok:lombok"
+  testCompileOnly "org.mapstruct:mapstruct:${mapstructVersion}"
+	testAnnotationProcessor "org.projectlombok:lombok"
+	testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	testAnnotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+}
+
+test { useJUnitPlatform() }
+
+eclipse {
+  classpath {
+    containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
+    file.whenMerged { cp ->
+      def entries = cp.entries;
+      def src = new org.gradle.plugins.ide.eclipse.model.SourceFolder('build/generated/sources/annotationProcessor/java/main/', null)
+      entries.add(src)
+    }
+  }
+}
+
+task cucumber() {
+  dependsOn assemble, testClasses
+  doLast {
+    javaexec {
+      main = "io.cucumber.core.cli.Main"
+      classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+      args = [
+        '--plugin', 'pretty', '--plugin', 'html:build/reports/cucumber/cucumber-report.html',
+        '--glue', 'com.vaaaarlos.beerstock.cucumber', 'src/test/resources']
+    }
+  }
+}
