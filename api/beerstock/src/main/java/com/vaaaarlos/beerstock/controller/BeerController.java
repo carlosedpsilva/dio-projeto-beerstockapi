@@ -2,6 +2,7 @@ package com.vaaaarlos.beerstock.controller;
 
 import javax.validation.Valid;
 
+import com.vaaaarlos.beerstock.controller.docs.BeerControllerDocs;
 import com.vaaaarlos.beerstock.dto.request.BeerInsertRequest;
 import com.vaaaarlos.beerstock.dto.response.MessageResponse;
 import com.vaaaarlos.beerstock.service.BeerService;
@@ -19,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("api/v1/beers")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class BeerController {
+public class BeerController implements BeerControllerDocs {
 
   private final BeerService beerService;
 
@@ -32,4 +33,5 @@ public class BeerController {
   public MessageResponse save(@RequestBody @Valid BeerInsertRequest beerInsertRequest) {
     return beerService.save(beerInsertRequest);
   }
+
 }
