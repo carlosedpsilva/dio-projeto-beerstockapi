@@ -1,6 +1,7 @@
 package com.vaaaarlos.beerstock.cucumber.stepdef;
 
 import com.vaaaarlos.beerstock.dto.request.BeerInsertRequest;
+import com.vaaaarlos.beerstock.entity.Beer;
 import com.vaaaarlos.beerstock.utils.BeerUtils;
 
 import org.springframework.data.domain.PageRequest;
@@ -16,11 +17,10 @@ public class CommonStepDefs {
   public static final int VALID_BEER_INCREMENT = 40;
   public static final int INVALID_BEER_INCREMENT = 41;
 
-  @Getter
-  private static BeerInsertRequest expectedBeerInsertRequest;
+  private @Getter static Beer expectedSavedBeer = BeerUtils.createFakeEntity();
+  private @Getter static PageRequest pageRequest = PageRequest.of(0, 8);
 
-  @Getter
-  private static PageRequest pageRequest = PageRequest.of(0, 8);
+  private @Getter static BeerInsertRequest expectedBeerInsertRequest;
 
   @Given("a valid Beer insert request is provided")
   public void a_valid_beer_insert_request_is_provided() {

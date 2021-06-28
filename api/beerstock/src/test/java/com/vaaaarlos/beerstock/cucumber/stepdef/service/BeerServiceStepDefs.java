@@ -50,9 +50,8 @@ public class BeerServiceStepDefs {
   @Autowired @Qualifier("mockedBeerRepository")
   private BeerRepository beerRepository;
 
-  private Beer expectedSavedBeer = BeerUtils.createFakeEntity();
-
   private PageRequest pageRequest = CommonStepDefs.getPageRequest();
+  private Beer expectedSavedBeer = CommonStepDefs.getExpectedSavedBeer();
   private BeerInsertRequest expectedBeerInsertRequest = CommonStepDefs.getExpectedBeerInsertRequest();
 
   @When("repository find by name method is called and result is found")
