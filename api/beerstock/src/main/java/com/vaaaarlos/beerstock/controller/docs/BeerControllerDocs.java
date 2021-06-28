@@ -22,17 +22,24 @@ public interface BeerControllerDocs {
     @ApiResponse(responseCode = "400", description = "Missing required fields or wrong field range value"),
     @ApiResponse(responseCode = "409", description = "Beer with provided name already exists")
   })
-  public MessageResponse save(BeerInsertRequest beerInsertRequest);
+  MessageResponse save(BeerInsertRequest beerInsertRequest);
 
   @Operation(summary = "Beer find by ID operation")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Beer found"),
     @ApiResponse(responseCode = "404", description = "Beer with provided ID not found")
   })
-  public BeerResponse findById(long id);
+  BeerResponse findById(long id);
 
   @Operation(summary = "Beer find all operation")
   @ApiResponse(responseCode = "200", description = "Beers found")
-  public Page<BeerResponse> findAll(Integer page, Integer linesPerPage, String direction, String orderBy, String name);
+  Page<BeerResponse> findAll(Integer page, Integer linesPerPage, String direction, String orderBy, String name);
+
+  @Operation(summary = "Beer delete by ID operation")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Beer deleted"),
+    @ApiResponse(responseCode = "404", description = "Beer with provided ID not found")
+  })
+  MessageResponse deleteById(long id);
 
 }
