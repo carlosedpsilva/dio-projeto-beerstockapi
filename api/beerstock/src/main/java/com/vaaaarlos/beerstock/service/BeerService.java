@@ -1,6 +1,7 @@
 package com.vaaaarlos.beerstock.service;
 
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.BASIC_MESSAGE;
+import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.DELETED;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.SAVED;
 
 import com.vaaaarlos.beerstock.dto.mapper.BeerMapper;
@@ -51,6 +52,16 @@ public class BeerService {
     name = name.isBlank() ? null : name;
     var pagedBeers = beerRepository.pageAll(pageRequest, name);
     return pagedBeers.map(beerMapper::toBeerResponse);
+  }
+
+  /*
+   * DELETE OPERATION
+   */
+
+  public MessageResponse deleteById(long id) throws BeerNotFoundException {
+    verifyIfExists(id);
+    beerRepository.deleteById(id);
+    return BeerstockUtils.createMessageResponse(BASIC_MESSAGE, DELETED, id);
   }
 
   /*
