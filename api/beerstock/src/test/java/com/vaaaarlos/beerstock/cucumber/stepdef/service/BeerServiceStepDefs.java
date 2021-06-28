@@ -4,12 +4,14 @@ import static com.vaaaarlos.beerstock.cucumber.stepdef.CommonStepDefs.INVALID_BE
 import static com.vaaaarlos.beerstock.cucumber.stepdef.CommonStepDefs.VALID_BEER_ID;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.BASIC_MESSAGE;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.createMessageResponse;
+import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.DELETED;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.SAVED;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -81,6 +83,11 @@ public class BeerServiceStepDefs {
     when(beerRepository.pageAll(any(Pageable.class), nullable(String.class))).thenReturn(expectedPagedBeers);
   }
 
+  @When("repository delete by id method is called")
+  public void repository_delete_by_id_method_is_called() {
+    doNothing().when(beerRepository).deleteById(VALID_BEER_ID);
+  }
+
   @Then("a BeerAlreadyExistsException should be thrown on save beer")
   public void a_beer_already_exists_exception_should_be_thrown_on_save_beer() {
     assertThrows(BeerAlreadyExistsException.class, () -> beerService.save(expectedBeerInsertRequest));
@@ -89,6 +96,11 @@ public class BeerServiceStepDefs {
   @Then("a BeerNotFoundException should be thrown on find beer by id")
   public void a_beer_not_found_exception_should_be_thrown_on_find_beer_by_id() {
     assertThrows(BeerNotFoundException.class, () -> beerService.findById(INVALID_BEER_ID));
+  }
+
+  @Then("a BeerNotFoundException should be thrown on delete beer by id")
+  public void a_beer_not_found_exception_should_be_thrown_on_delete_beer_by_id() {
+    assertThrows(BeerNotFoundException.class, () -> beerService.deleteById(INVALID_BEER_ID));
   }
 
   @Then("a success message response should be returned on save beer")
@@ -111,6 +123,13 @@ public class BeerServiceStepDefs {
     var expectedPagedBeerResponses = new PageImpl<>(beerResponseList, pageRequest, beerResponseList.size());
     var pagedBeerResponses = beerService.findAll(pageRequest, "");
     assertEquals(expectedPagedBeerResponses, pagedBeerResponses);
+  }
+
+  @Then("a success message response should be returned on delete beer by id")
+  public void a_success_message_response_should_be_returned_on_delete_beer_by_id() {
+    var messageResponse = beerService.deleteById(VALID_BEER_ID);
+    var expectedMessageResponse = createMessageResponse(BASIC_MESSAGE, DELETED, VALID_BEER_ID);
+    assertEquals(expectedMessageResponse, messageResponse);
   }
 
 }
