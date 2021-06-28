@@ -14,6 +14,8 @@ import com.vaaaarlos.beerstock.repository.BeerRepository;
 import com.vaaaarlos.beerstock.util.BeerstockUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -43,6 +45,12 @@ public class BeerService {
   public BeerResponse findById(long id) throws BeerNotFoundException {
     var savedBeer = verifyIfExists(id);
     return beerMapper.toBeerResponse(savedBeer);
+  }
+
+  public Page<BeerResponse> findAll(Pageable pageRequest, String name) {
+    name = name.isBlank() ? null : name;
+    var pagedBeers = beerRepository.pageAll(pageRequest, name);
+    return pagedBeers.map(beerMapper::toBeerResponse);
   }
 
   /*
