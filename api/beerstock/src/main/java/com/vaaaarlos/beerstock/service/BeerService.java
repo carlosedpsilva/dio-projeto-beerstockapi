@@ -72,6 +72,8 @@ public class BeerService {
 
   public MessageResponse incrementBeerQuantity(long id, int quantityToIncrement) {
     var beerToPatch = verifyIfExists(id);
+    quantityToIncrement = quantityToIncrement < 0 ? 0 : quantityToIncrement;
+
     var currentQuantity = beerToPatch.getQuantity();
     var stockCapacity = beerToPatch.getMax();
     var finalQuantity = currentQuantity + quantityToIncrement;
