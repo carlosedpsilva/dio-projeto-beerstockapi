@@ -85,3 +85,14 @@ task cucumber() {
     }
   }
 }
+
+task stage(dependsOn: ['build', 'clean']) {
+  build {
+    bootJar {
+      archiveFileName = "app.jar"
+      destinationDirectory = file(project.rootDir)
+    }
+  }
+}
+
+stage.mustRunAfter(clean)
