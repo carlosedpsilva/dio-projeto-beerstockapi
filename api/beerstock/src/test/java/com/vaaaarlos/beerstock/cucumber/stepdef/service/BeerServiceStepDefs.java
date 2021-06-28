@@ -45,9 +45,10 @@ public class BeerServiceStepDefs {
   private BeerRepository beerRepository;
 
   private Beer expectedSavedBeer = BeerUtils.createFakeEntity();
+
+  private PageRequest pageRequest = CommonStepDefs.getPageRequest();
   private BeerInsertRequest expectedBeerInsertRequest = CommonStepDefs.getExpectedBeerInsertRequest();
 
-  private PageRequest pageRequest = PageRequest.of(0, 8);
 
   @When("repository find by name method is called and result is found")
   public void repository_find_by_name_method_is_called_and_result_is_found() {

@@ -7,12 +7,16 @@ import static com.vaaaarlos.beerstock.util.BeerstockUtils.createMessageResponse;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.SAVED;
 import static com.vaaaarlos.beerstock.utils.JsonConverter.asJsonString;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Collections;
 
 import com.vaaaarlos.beerstock.cucumber.context.controller.BeerControllerContextConfiguration;
 import com.vaaaarlos.beerstock.cucumber.stepdef.CommonStepDefs;
@@ -25,6 +29,9 @@ import com.vaaaarlos.beerstock.utils.BeerUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -44,6 +51,8 @@ public class BeerControllerStepDefs {
   private BeerService beerService;
 
   private MessageResponse expectedMessageResponse;
+
+  private PageRequest pageRequest = CommonStepDefs.getPageRequest();
   private BeerInsertRequest expectedBeerInsertRequest = CommonStepDefs.getExpectedBeerInsertRequest();
 
   @When("service save method is called")
@@ -66,6 +75,13 @@ public class BeerControllerStepDefs {
   @When("service find by id method is called and no result is found")
   public void service_find_by_id_method_is_called_and_no_result_is_found() {
     when(beerService.findById(INVALID_BEER_ID)).thenThrow(BeerNotFoundException.class);
+  }
+
+  @When("service find all method is called")
+  public void service_find_all_method_is_called() {
+    var beerResponseList = Collections.singletonList(BeerUtils.createFakeBeerResponse());
+    var expectedPagedBeerResponses = new PageImpl<>(beerResponseList, pageRequest, beerResponseList.size());
+    when(beerService.findAll(any(Pageable.class), anyString())).thenReturn(expectedPagedBeerResponses);
   }
 
   @Then("a success message response should be shown with status code created")
@@ -110,6 +126,15 @@ public class BeerControllerStepDefs {
         .contentType(APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isNotFound());
+  }
+
+  @Then("a beer paged response should be shown we status ok")
+  public void a_beer_paged_response_should_be_shown_we_status_ok() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders.get(BEER_API_URL_PATH)
+    .contentType(APPLICATION_JSON))
+    .andDo(print())
+    .andExpect(status().isOk())
+    .andExpect(jsonPath("$.content[0].id", is(1)));
   }
 
 }
