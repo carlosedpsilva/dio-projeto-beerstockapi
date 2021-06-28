@@ -61,7 +61,7 @@ public class BeerControllerStepDefs {
     when(beerService.save(expectedBeerInsertRequest)).thenReturn(expectedMessageResponse);
   }
 
-  @When("service save method is called and a Beer already exists with provided name")
+  @When("service save method is called and a Beer already exists with the provided name")
   public void service_save_method_is_called_and_a_beer_already_exists_with_provided_name() {
     when(beerService.save(expectedBeerInsertRequest)).thenThrow(BeerAlreadyExistsException.class);
   }
@@ -84,8 +84,8 @@ public class BeerControllerStepDefs {
     when(beerService.findAll(any(Pageable.class), anyString())).thenReturn(expectedPagedBeerResponses);
   }
 
-  @Then("a success message response should be shown with status code created")
-  public void a_success_message_response_should_be_shown_with_status_code_created() throws Exception {
+  @Then("a success message response should be shown with status code created on post beer")
+  public void a_success_message_response_should_be_shown_with_status_code_created_on_post_beer() throws Exception {
     mockMvc.perform(post(BEER_API_URL_PATH)
         .contentType(APPLICATION_JSON)
         .content(asJsonString(expectedBeerInsertRequest)))
@@ -94,8 +94,8 @@ public class BeerControllerStepDefs {
         .andExpect(jsonPath("$.message", is(expectedMessageResponse.getMessage())));
   }
 
-  @Then("an error message response should be shown with status code conflict")
-  public void an_error_message_response_should_be_shown_with_status_code_conflict() throws Exception {
+  @Then("an error message response should be shown with status code conflict on post beer")
+  public void an_error_message_response_should_be_shown_with_status_code_conflict_on_post_beer() throws Exception {
     mockMvc.perform(post(BEER_API_URL_PATH)
         .contentType(APPLICATION_JSON)
         .content(asJsonString(expectedBeerInsertRequest)))
@@ -103,8 +103,8 @@ public class BeerControllerStepDefs {
         .andExpect(status().isConflict());
   }
 
-  @Then("an error message response should be shown with status code bad request")
-  public void an_error_message_response_should_be_shown_with_status_code_bad_request() throws Exception {
+  @Then("an error message response should be shown with status code bad request on post beer")
+  public void an_error_message_response_should_be_shown_with_status_code_bad_request_on_post_beer() throws Exception {
     mockMvc.perform(post(BEER_API_URL_PATH)
         .contentType(APPLICATION_JSON)
         .content(asJsonString(expectedBeerInsertRequest)))
@@ -112,24 +112,24 @@ public class BeerControllerStepDefs {
         .andExpect(status().isBadRequest());
   }
 
-  @Then("the corresponding beer entity response should be shown with status code ok")
-  public void the_corresponding_beer_entity_response_should_be_shown_with_status_code_ok() throws Exception {
+  @Then("the corresponding beer entity response should be shown with status code ok on get beer by id")
+  public void the_corresponding_beer_entity_response_should_be_shown_with_status_code_ok_on_get_beer_by_id() throws Exception {
     mockMvc.perform(MockMvcRequestBuilders.get(String.format("%s/%d", BEER_API_URL_PATH, VALID_BEER_ID))
         .contentType(APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk());
   }
 
-  @Then("an error message response should be shown with status code not found")
-  public void an_error_message_response_should_be_shown_with_status_code_not_found() throws Exception {
+  @Then("an error message response should be shown with status code not found on get beer by id")
+  public void an_error_message_response_should_be_shown_with_status_code_not_found_on_get_beer_by_id() throws Exception {
     mockMvc.perform(MockMvcRequestBuilders.get(String.format("%s/%d", BEER_API_URL_PATH, INVALID_BEER_ID))
         .contentType(APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isNotFound());
   }
 
-  @Then("a beer paged response should be shown we status ok")
-  public void a_beer_paged_response_should_be_shown_we_status_ok() throws Exception {
+  @Then("a beer paged response should be shown we status ok on get all beers")
+  public void a_beer_paged_response_should_be_shown_we_status_ok_on_get_all_beers() throws Exception {
     mockMvc.perform(MockMvcRequestBuilders.get(BEER_API_URL_PATH)
     .contentType(APPLICATION_JSON))
     .andDo(print())

@@ -49,7 +49,6 @@ public class BeerServiceStepDefs {
   private PageRequest pageRequest = CommonStepDefs.getPageRequest();
   private BeerInsertRequest expectedBeerInsertRequest = CommonStepDefs.getExpectedBeerInsertRequest();
 
-
   @When("repository find by name method is called and result is found")
   public void repository_find_by_name_method_is_called_and_result_is_found() {
     when(beerRepository.findByName(anyString())).thenReturn(Optional.of(expectedSavedBeer));
@@ -82,32 +81,32 @@ public class BeerServiceStepDefs {
     when(beerRepository.pageAll(any(Pageable.class), nullable(String.class))).thenReturn(expectedPagedBeers);
   }
 
-  @Then("a BeerAlreadyExistsException should be thrown")
-  public void a_beer_already_exists_exception_should_be_thrown() {
+  @Then("a BeerAlreadyExistsException should be thrown on save beer")
+  public void a_beer_already_exists_exception_should_be_thrown_on_save_beer() {
     assertThrows(BeerAlreadyExistsException.class, () -> beerService.save(expectedBeerInsertRequest));
   }
 
-  @Then("a BeerNotFoundException should be thrown")
-  public void a_beer_not_found_exception_should_be_thrown() {
+  @Then("a BeerNotFoundException should be thrown on find beer by id")
+  public void a_beer_not_found_exception_should_be_thrown_on_find_beer_by_id() {
     assertThrows(BeerNotFoundException.class, () -> beerService.findById(INVALID_BEER_ID));
   }
 
-  @Then("a success message response should be returned")
-  public void a_success_message_response_should_be_returned() {
+  @Then("a success message response should be returned on save beer")
+  public void a_success_message_response_should_be_returned_on_save_beer() {
     var expectedMessageResponse = createMessageResponse(BASIC_MESSAGE, SAVED, expectedSavedBeer.getId());
     var messageResponse = beerService.save(expectedBeerInsertRequest);
     assertEquals(expectedMessageResponse, messageResponse);
   }
 
-  @Then("the corresponding beer entity response should be returned")
-  public void the_corresponding_beer_entity_response_should_be_returned() {
+  @Then("the corresponding beer entity response should be returned on find beer by id")
+  public void the_corresponding_beer_entity_response_should_be_returned_on_find_beer_by_id() {
     var expectedBeerResponse = BeerUtils.createFakeBeerResponse();
     var beerResponse = beerService.findById(VALID_BEER_ID);
     assertEquals(expectedBeerResponse, beerResponse);
   }
 
-  @Then("a beer paged response should be returned")
-  public void a_beer_paged_response_should_be_returned() {
+  @Then("a beer paged response should be returned on find all beers")
+  public void a_beer_paged_response_should_be_returned_on_find_all_beers() {
     var beerResponseList = Collections.singletonList(BeerUtils.createFakeBeerResponse());
     var expectedPagedBeerResponses = new PageImpl<>(beerResponseList, pageRequest, beerResponseList.size());
     var pagedBeerResponses = beerService.findAll(pageRequest, "");
