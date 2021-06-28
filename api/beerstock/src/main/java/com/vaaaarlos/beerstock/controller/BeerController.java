@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -75,6 +76,16 @@ public class BeerController implements BeerControllerDocs {
   @ResponseStatus(HttpStatus.OK)
   public MessageResponse deleteById(@PathVariable long id) throws BeerNotFoundException {
     return beerService.deleteById(id);
+  }
+
+  /*
+   * DELETE OPERATION
+   */
+
+  @PatchMapping("{id}/increment/{increment}")
+  @ResponseStatus(HttpStatus.OK)
+  public MessageResponse incrementBeerQuantity(@PathVariable long id, @PathVariable int increment) throws BeerNotFoundException {
+    return beerService.incrementBeerQuantity(id, increment);
   }
 
 }
