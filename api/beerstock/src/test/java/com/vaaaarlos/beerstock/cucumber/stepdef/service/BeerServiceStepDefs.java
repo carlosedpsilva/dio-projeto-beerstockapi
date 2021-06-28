@@ -1,8 +1,11 @@
 package com.vaaaarlos.beerstock.cucumber.stepdef.service;
 
 import static com.vaaaarlos.beerstock.cucumber.stepdef.CommonStepDefs.INVALID_BEER_ID;
+import static com.vaaaarlos.beerstock.cucumber.stepdef.CommonStepDefs.INVALID_BEER_INCREMENT;
 import static com.vaaaarlos.beerstock.cucumber.stepdef.CommonStepDefs.VALID_BEER_ID;
+import static com.vaaaarlos.beerstock.cucumber.stepdef.CommonStepDefs.VALID_BEER_INCREMENT;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.BASIC_MESSAGE;
+import static com.vaaaarlos.beerstock.util.BeerstockUtils.INCREMENT_MESSAGE;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.createMessageResponse;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.DELETED;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.SAVED;
@@ -23,6 +26,7 @@ import com.vaaaarlos.beerstock.dto.request.BeerInsertRequest;
 import com.vaaaarlos.beerstock.entity.Beer;
 import com.vaaaarlos.beerstock.exception.BeerAlreadyExistsException;
 import com.vaaaarlos.beerstock.exception.BeerNotFoundException;
+import com.vaaaarlos.beerstock.exception.BeerStockExceededException;
 import com.vaaaarlos.beerstock.repository.BeerRepository;
 import com.vaaaarlos.beerstock.service.BeerService;
 import com.vaaaarlos.beerstock.utils.BeerUtils;
@@ -103,6 +107,17 @@ public class BeerServiceStepDefs {
     assertThrows(BeerNotFoundException.class, () -> beerService.deleteById(INVALID_BEER_ID));
   }
 
+  @Then("a BeerNotFoundException should be thrown on increment beer quantity")
+  public void a_beer_not_found_exception_should_be_thrown_on_increment_beer_quantity() {
+    assertThrows(BeerNotFoundException.class, () -> beerService.incrementBeerQuantity(INVALID_BEER_ID, VALID_BEER_INCREMENT));
+  }
+
+  @Then("a BeerStockExceededException should be thrown on increment beer quantity")
+  public void a_beer_stock_exceeded_exception_should_be_thrown_on_increment_beer_quantity() {
+    assertThrows(BeerStockExceededException.class, () -> beerService.incrementBeerQuantity(VALID_BEER_ID, INVALID_BEER_INCREMENT));
+
+  }
+
   @Then("a success message response should be returned on save beer")
   public void a_success_message_response_should_be_returned_on_save_beer() {
     var expectedMessageResponse = createMessageResponse(BASIC_MESSAGE, SAVED, expectedSavedBeer.getId());
@@ -129,6 +144,15 @@ public class BeerServiceStepDefs {
   public void a_success_message_response_should_be_returned_on_delete_beer_by_id() {
     var messageResponse = beerService.deleteById(VALID_BEER_ID);
     var expectedMessageResponse = createMessageResponse(BASIC_MESSAGE, DELETED, VALID_BEER_ID);
+    assertEquals(expectedMessageResponse, messageResponse);
+  }
+
+  @Then("a success message response should be shown with status code ok on increment beer quantity")
+  public void a_success_message_response_should_be_shown_with_status_code_ok_on_increment_beer_quantity() {
+    var expectedQquantity = expectedSavedBeer.getQuantity();
+    var expectedFinalQuantity = expectedQquantity + VALID_BEER_INCREMENT;
+    var messageResponse = beerService.incrementBeerQuantity(VALID_BEER_ID, VALID_BEER_INCREMENT);
+    var expectedMessageResponse = createMessageResponse(INCREMENT_MESSAGE, VALID_BEER_ID, expectedQquantity, expectedFinalQuantity);
     assertEquals(expectedMessageResponse, messageResponse);
   }
 

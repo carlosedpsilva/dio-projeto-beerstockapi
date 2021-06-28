@@ -13,6 +13,9 @@ public class CommonStepDefs {
   public static final long VALID_BEER_ID = 1L;
   public static final long INVALID_BEER_ID = 2L;
 
+  public static final int VALID_BEER_INCREMENT = 40;
+  public static final int INVALID_BEER_INCREMENT = 41;
+
   @Getter
   private static BeerInsertRequest expectedBeerInsertRequest;
 
