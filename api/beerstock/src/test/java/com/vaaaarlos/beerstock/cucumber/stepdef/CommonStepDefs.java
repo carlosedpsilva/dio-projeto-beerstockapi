@@ -8,6 +8,9 @@ import lombok.Getter;
 
 public class CommonStepDefs {
 
+  public static final long VALID_BEER_ID = 1L;
+  public static final long INVALID_BEER_ID = 2L;
+
   @Getter
   private static BeerInsertRequest expectedBeerInsertRequest;
 

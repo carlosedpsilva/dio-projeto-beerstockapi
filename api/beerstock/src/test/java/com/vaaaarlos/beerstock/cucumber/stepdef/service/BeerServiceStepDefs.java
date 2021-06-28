@@ -1,5 +1,7 @@
 package com.vaaaarlos.beerstock.cucumber.stepdef.service;
 
+import static com.vaaaarlos.beerstock.cucumber.stepdef.CommonStepDefs.INVALID_BEER_ID;
+import static com.vaaaarlos.beerstock.cucumber.stepdef.CommonStepDefs.VALID_BEER_ID;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.BASIC_MESSAGE;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.createMessageResponse;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.SAVED;
@@ -15,6 +17,7 @@ import com.vaaaarlos.beerstock.cucumber.stepdef.CommonStepDefs;
 import com.vaaaarlos.beerstock.dto.request.BeerInsertRequest;
 import com.vaaaarlos.beerstock.entity.Beer;
 import com.vaaaarlos.beerstock.exception.BeerAlreadyExistsException;
+import com.vaaaarlos.beerstock.exception.BeerNotFoundException;
 import com.vaaaarlos.beerstock.repository.BeerRepository;
 import com.vaaaarlos.beerstock.service.BeerService;
 import com.vaaaarlos.beerstock.utils.BeerUtils;
@@ -48,6 +51,16 @@ public class BeerServiceStepDefs {
     when(beerRepository.findByName(expectedBeerInsertRequest.getName())).thenReturn(Optional.empty());
   }
 
+  @When("repository find by id method is called and result is found")
+  public void repository_find_by_id_method_is_called_and_result_is_found() {
+    when(beerRepository.findById(VALID_BEER_ID)).thenReturn(Optional.of(expectedSavedBeer));
+  }
+
+  @When("repository find by id method is called and no result is found")
+  public void repository_find_by_id_method_is_called_and_no_result_is_found() {
+    when(beerRepository.findById(INVALID_BEER_ID)).thenReturn(Optional.empty());
+  }
+
   @When("repository save method is called")
   public void repository_save_method_is_called() {
     when(beerRepository.save(any(Beer.class))).thenReturn(expectedSavedBeer);
@@ -58,11 +71,23 @@ public class BeerServiceStepDefs {
     assertThrows(BeerAlreadyExistsException.class, () -> beerService.save(expectedBeerInsertRequest));
   }
 
+  @Then("a BeerNotFoundException should be thrown")
+  public void a_beer_not_found_exception_should_be_thrown() {
+    assertThrows(BeerNotFoundException.class, () -> beerService.findById(INVALID_BEER_ID));
+  }
+
   @Then("a success message response should be returned")
   public void a_success_message_response_should_be_returned() {
     var expectedMessageResponse = createMessageResponse(BASIC_MESSAGE, SAVED, expectedSavedBeer.getId());
     var messageResponse = beerService.save(expectedBeerInsertRequest);
     assertEquals(expectedMessageResponse, messageResponse);
+  }
+
+  @Then("the corresponding beer entity response should be returned")
+  public void the_corresponding_beer_entity_response_should_be_returned() {
+    var expectedBeerResponse = BeerUtils.createFakeBeerResponse();
+    var beerResponse = beerService.findById(VALID_BEER_ID);
+    assertEquals(expectedBeerResponse, beerResponse);
   }
 
 }
