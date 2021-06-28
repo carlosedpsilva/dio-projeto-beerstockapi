@@ -1,6 +1,7 @@
 package com.vaaaarlos.beerstock.service;
 
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.BASIC_MESSAGE;
+import static com.vaaaarlos.beerstock.util.BeerstockUtils.INCREMENT_MESSAGE;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.DELETED;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.SAVED;
 
@@ -11,6 +12,7 @@ import com.vaaaarlos.beerstock.dto.response.MessageResponse;
 import com.vaaaarlos.beerstock.entity.Beer;
 import com.vaaaarlos.beerstock.exception.BeerAlreadyExistsException;
 import com.vaaaarlos.beerstock.exception.BeerNotFoundException;
+import com.vaaaarlos.beerstock.exception.BeerStockExceededException;
 import com.vaaaarlos.beerstock.repository.BeerRepository;
 import com.vaaaarlos.beerstock.util.BeerstockUtils;
 
@@ -62,6 +64,24 @@ public class BeerService {
     verifyIfExists(id);
     beerRepository.deleteById(id);
     return BeerstockUtils.createMessageResponse(BASIC_MESSAGE, DELETED, id);
+  }
+
+  /*
+   * PATCH OPERATION
+   */
+
+  public MessageResponse incrementBeerQuantity(long id, int quantityToIncrement) {
+    var beerToPatch = verifyIfExists(id);
+    var currentQuantity = beerToPatch.getQuantity();
+    var stockCapacity = beerToPatch.getMax();
+    var finalQuantity = currentQuantity + quantityToIncrement;
+
+    if (finalQuantity > stockCapacity)
+      throw new BeerStockExceededException(id, currentQuantity, quantityToIncrement, stockCapacity);
+
+    beerToPatch.setQuantity(finalQuantity);
+    beerRepository.save(beerToPatch);
+    return BeerstockUtils.createMessageResponse(INCREMENT_MESSAGE, id, currentQuantity, finalQuantity);
   }
 
   /*

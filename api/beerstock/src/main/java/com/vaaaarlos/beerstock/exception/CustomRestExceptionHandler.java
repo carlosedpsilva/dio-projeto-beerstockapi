@@ -33,7 +33,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(apiError, headers, apiError.getStatus());
   }
 
-  @ExceptionHandler(value = { BeerNotFoundException.class, BeerAlreadyExistsException.class })
+  @ExceptionHandler(value = { BeerNotFoundException.class, BeerAlreadyExistsException.class, BeerStockExceededException.class })
   public ResponseEntity<Object> handleProcessValidation(CustomApiException e) {
     var apiError = new ApiError(e.getStatus().value(), e.getStatus(), e.getLocalizedMessage(), e.getClass().getSimpleName());
     return new ResponseEntity<>(apiError, new HttpHeaders(), e.getStatus());

@@ -5,6 +5,7 @@ import com.vaaaarlos.beerstock.dto.response.MessageResponse;
 public class BeerstockUtils {
 
   public static final String BASIC_MESSAGE = "%s Beer with ID %d";
+  public static final String INCREMENT_MESSAGE = "Incremented Beer with ID %d quantity from %d to %d";
 
   private BeerstockUtils() { }
 
