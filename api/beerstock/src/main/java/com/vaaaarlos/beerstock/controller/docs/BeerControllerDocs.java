@@ -6,6 +6,8 @@ import com.vaaaarlos.beerstock.dto.request.BeerInsertRequest;
 import com.vaaaarlos.beerstock.dto.response.BeerResponse;
 import com.vaaaarlos.beerstock.dto.response.MessageResponse;
 
+import org.springframework.data.domain.Page;
+
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,5 +30,9 @@ public interface BeerControllerDocs {
     @ApiResponse(responseCode = "404", description = "Beer with provided ID not found")
   })
   public BeerResponse findById(long id);
+
+  @Operation(summary = "Beer find all operation")
+  @ApiResponse(responseCode = "200", description = "Beers found")
+  public Page<BeerResponse> findAll(Integer page, Integer linesPerPage, String direction, String orderBy, String name);
 
 }
