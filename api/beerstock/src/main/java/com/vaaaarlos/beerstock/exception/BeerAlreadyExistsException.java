@@ -10,7 +10,11 @@ public class BeerAlreadyExistsException extends CustomApiException {
 
   public BeerAlreadyExistsException(String name) {
     super(String.format("Beer with name '%s' already exists", name));
-    setStatus(HttpStatus.CONFLICT);
+  }
+
+  @Override
+  public HttpStatus getStatus() {
+    return HttpStatus.CONFLICT;
   }
 
 }

@@ -9,13 +9,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class BeerNotFoundException extends CustomApiException {
 
   public BeerNotFoundException(long id) {
-    super(String.format("No Beer found with ID '%d'", id));
-    setStatus(HttpStatus.NOT_FOUND);
+    super(String.format("No Beer found with ID %d", id));
   }
 
   public BeerNotFoundException(String name) {
     super(String.format("No Beer found with name '%s'", name));
-    setStatus(HttpStatus.NOT_FOUND);
+  }
+
+  @Override
+  public HttpStatus getStatus() {
+    return HttpStatus.NOT_FOUND;
   }
 
 

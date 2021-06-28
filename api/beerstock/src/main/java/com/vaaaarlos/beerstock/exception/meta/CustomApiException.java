@@ -2,21 +2,12 @@ package com.vaaaarlos.beerstock.exception.meta;
 
 import org.springframework.http.HttpStatus;
 
-import lombok.Getter;
-import lombok.Setter;
+public abstract class CustomApiException extends RuntimeException {
 
-@Getter
-@Setter
-public class CustomApiException extends RuntimeException {
-
-  private HttpStatus status;
-
-  public CustomApiException() {
-    super();
-  }
-
-  public CustomApiException(String message) {
+  protected CustomApiException(String message) {
     super(message);
   }
+
+  public abstract HttpStatus getStatus();
 
 }
