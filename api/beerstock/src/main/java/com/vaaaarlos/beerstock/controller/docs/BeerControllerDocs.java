@@ -42,4 +42,12 @@ public interface BeerControllerDocs {
   })
   MessageResponse deleteById(long id);
 
+  @Operation(summary = "Beer increment quantity operation")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Beer quantity incremented"),
+    @ApiResponse(responseCode = "400", description = "Provided quantity increment exceeds max Beer stock capacity"),
+    @ApiResponse(responseCode = "404", description = "Beer with provided ID not found")
+  })
+  MessageResponse incrementBeerQuantity(long id, int increment);
+
 }
