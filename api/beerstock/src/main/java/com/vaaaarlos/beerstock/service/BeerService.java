@@ -5,6 +5,7 @@ import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.SAVED;
 
 import com.vaaaarlos.beerstock.dto.mapper.BeerMapper;
 import com.vaaaarlos.beerstock.dto.request.BeerInsertRequest;
+import com.vaaaarlos.beerstock.dto.response.BeerResponse;
 import com.vaaaarlos.beerstock.dto.response.MessageResponse;
 import com.vaaaarlos.beerstock.entity.Beer;
 import com.vaaaarlos.beerstock.exception.BeerAlreadyExistsException;
@@ -28,12 +29,20 @@ public class BeerService {
    * POST OPERATION
    */
 
-  public MessageResponse save(BeerInsertRequest beerInsertRequest) {
+  public MessageResponse save(BeerInsertRequest beerInsertRequest) throws BeerAlreadyExistsException {
     verifyIfExists(beerInsertRequest.getName());
     var beerToSave = beerMapper.toModel(beerInsertRequest);
     var savedBeer = beerRepository.save(beerToSave);
     return BeerstockUtils.createMessageResponse(BASIC_MESSAGE, SAVED, savedBeer.getId());
+  }
 
+  /*
+   * GET OPERATION
+   */
+
+  public BeerResponse findById(long id) throws BeerNotFoundException {
+    var savedBeer = verifyIfExists(id);
+    return beerMapper.toBeerResponse(savedBeer);
   }
 
   /*
