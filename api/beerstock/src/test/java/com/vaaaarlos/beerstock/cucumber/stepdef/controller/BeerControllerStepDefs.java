@@ -4,6 +4,7 @@ import static com.vaaaarlos.beerstock.cucumber.stepdef.CommonStepDefs.INVALID_BE
 import static com.vaaaarlos.beerstock.cucumber.stepdef.CommonStepDefs.VALID_BEER_ID;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.BASIC_MESSAGE;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.createMessageResponse;
+import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.DELETED;
 import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.SAVED;
 import static com.vaaaarlos.beerstock.utils.JsonConverter.asJsonString;
 import static org.hamcrest.core.Is.is;
@@ -11,6 +12,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,7 +37,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -57,7 +59,7 @@ public class BeerControllerStepDefs {
 
   @When("service save method is called")
   public void service_save_method_is_called() {
-    expectedMessageResponse = createMessageResponse(BASIC_MESSAGE, SAVED, 1L);
+    expectedMessageResponse = createMessageResponse(BASIC_MESSAGE, SAVED, VALID_BEER_ID);
     when(beerService.save(expectedBeerInsertRequest)).thenReturn(expectedMessageResponse);
   }
 
@@ -75,6 +77,17 @@ public class BeerControllerStepDefs {
   @When("service find by id method is called and no result is found")
   public void service_find_by_id_method_is_called_and_no_result_is_found() {
     when(beerService.findById(INVALID_BEER_ID)).thenThrow(BeerNotFoundException.class);
+  }
+
+  @When("service delete by id method is called and result is found")
+  public void service_delete_by_id_method_is_called_and_result_is_found() {
+    expectedMessageResponse = createMessageResponse(BASIC_MESSAGE, DELETED, VALID_BEER_ID);
+    when(beerService.deleteById(VALID_BEER_ID)).thenReturn(expectedMessageResponse);
+  }
+
+  @When("service delete by id method is called and no result is found")
+  public void service_delete_by_id_method_is_called_and_no_result_is_found() {
+    when(beerService.deleteById(INVALID_BEER_ID)).thenThrow(BeerNotFoundException.class);
   }
 
   @When("service find all method is called")
@@ -114,15 +127,16 @@ public class BeerControllerStepDefs {
 
   @Then("the corresponding beer entity response should be shown with status code ok on get beer by id")
   public void the_corresponding_beer_entity_response_should_be_shown_with_status_code_ok_on_get_beer_by_id() throws Exception {
-    mockMvc.perform(MockMvcRequestBuilders.get(String.format("%s/%d", BEER_API_URL_PATH, VALID_BEER_ID))
+    mockMvc.perform(get(String.format("%s/%d", BEER_API_URL_PATH, VALID_BEER_ID))
         .contentType(APPLICATION_JSON))
         .andDo(print())
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id", is(1)));
   }
 
   @Then("an error message response should be shown with status code not found on get beer by id")
   public void an_error_message_response_should_be_shown_with_status_code_not_found_on_get_beer_by_id() throws Exception {
-    mockMvc.perform(MockMvcRequestBuilders.get(String.format("%s/%d", BEER_API_URL_PATH, INVALID_BEER_ID))
+    mockMvc.perform(get(String.format("%s/%d", BEER_API_URL_PATH, INVALID_BEER_ID))
         .contentType(APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isNotFound());
@@ -130,11 +144,28 @@ public class BeerControllerStepDefs {
 
   @Then("a beer paged response should be shown we status ok on get all beers")
   public void a_beer_paged_response_should_be_shown_we_status_ok_on_get_all_beers() throws Exception {
-    mockMvc.perform(MockMvcRequestBuilders.get(BEER_API_URL_PATH)
-    .contentType(APPLICATION_JSON))
-    .andDo(print())
-    .andExpect(status().isOk())
-    .andExpect(jsonPath("$.content[0].id", is(1)));
+    mockMvc.perform(get(BEER_API_URL_PATH)
+        .contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.content[0].id", is(1)));
+  }
+
+  @Then("a success message response should be shown with status code created on delete beer by id")
+  public void a_success_message_response_should_be_shown_with_status_code_created_on_delete_beer_by_id() throws Exception {
+    mockMvc.perform(delete(String.format("%s/%d", BEER_API_URL_PATH, VALID_BEER_ID))
+        .contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.message", is(expectedMessageResponse.getMessage())));
+  }
+
+  @Then("an error message response should be shown with status code not found on delete beer by id")
+  public void an_error_message_response_should_be_shown_with_status_code_not_found_on_delete_beer_by_id() throws Exception {
+    mockMvc.perform(delete(String.format("%s/%d", BEER_API_URL_PATH, INVALID_BEER_ID))
+        .contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isNotFound());
   }
 
 }
