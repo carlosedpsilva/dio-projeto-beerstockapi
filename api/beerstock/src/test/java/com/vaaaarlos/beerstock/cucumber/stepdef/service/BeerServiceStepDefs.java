@@ -8,8 +8,11 @@ import static com.vaaaarlos.beerstock.util.BeerstockUtils.Operation.SAVED;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import com.vaaaarlos.beerstock.cucumber.context.service.BeerServiceContextConfiguration;
@@ -24,6 +27,9 @@ import com.vaaaarlos.beerstock.utils.BeerUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
 
 import io.cucumber.java.en.Then;
@@ -41,14 +47,16 @@ public class BeerServiceStepDefs {
   private Beer expectedSavedBeer = BeerUtils.createFakeEntity();
   private BeerInsertRequest expectedBeerInsertRequest = CommonStepDefs.getExpectedBeerInsertRequest();
 
+  private PageRequest pageRequest = PageRequest.of(0, 8);
+
   @When("repository find by name method is called and result is found")
   public void repository_find_by_name_method_is_called_and_result_is_found() {
-    when(beerRepository.findByName(expectedBeerInsertRequest.getName())).thenReturn(Optional.of(expectedSavedBeer));
+    when(beerRepository.findByName(anyString())).thenReturn(Optional.of(expectedSavedBeer));
   }
 
   @When("repository find by name method is called and no result is found")
   public void repository_find_by_name_method_is_called_and_no_result_is_found() {
-    when(beerRepository.findByName(expectedBeerInsertRequest.getName())).thenReturn(Optional.empty());
+    when(beerRepository.findByName(anyString())).thenReturn(Optional.empty());
   }
 
   @When("repository find by id method is called and result is found")
@@ -64,6 +72,13 @@ public class BeerServiceStepDefs {
   @When("repository save method is called")
   public void repository_save_method_is_called() {
     when(beerRepository.save(any(Beer.class))).thenReturn(expectedSavedBeer);
+  }
+
+  @When("repository find all method is called")
+  public void repository_find_all_method_is_called() {
+    var beerList = Collections.singletonList(BeerUtils.createFakeEntity());
+    var expectedPagedBeers = new PageImpl<>(beerList, pageRequest, beerList.size());
+    when(beerRepository.pageAll(any(Pageable.class), nullable(String.class))).thenReturn(expectedPagedBeers);
   }
 
   @Then("a BeerAlreadyExistsException should be thrown")
@@ -88,6 +103,14 @@ public class BeerServiceStepDefs {
     var expectedBeerResponse = BeerUtils.createFakeBeerResponse();
     var beerResponse = beerService.findById(VALID_BEER_ID);
     assertEquals(expectedBeerResponse, beerResponse);
+  }
+
+  @Then("a beer paged response should be returned")
+  public void a_beer_paged_response_should_be_returned() {
+    var beerResponseList = Collections.singletonList(BeerUtils.createFakeBeerResponse());
+    var expectedPagedBeerResponses = new PageImpl<>(beerResponseList, pageRequest, beerResponseList.size());
+    var pagedBeerResponses = beerService.findAll(pageRequest, "");
+    assertEquals(expectedPagedBeerResponses, pagedBeerResponses);
   }
 
 }
