@@ -1,13 +1,16 @@
 package com.vaaaarlos.beerstock.exception;
 
-import static org.springframework.http.HttpStatus.CONFLICT;
+import com.vaaaarlos.beerstock.exception.meta.CustomApiException;
 
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class BeerAlreadyExistsException extends ResponseStatusException {
+@ResponseStatus(HttpStatus.CONFLICT)
+public class BeerAlreadyExistsException extends CustomApiException {
 
   public BeerAlreadyExistsException(String name) {
-    super(CONFLICT, String.format("Beer with name '%s' already exists", name));
+    super(String.format("Beer with name '%s' already exists", name));
+    setStatus(HttpStatus.CONFLICT);
   }
 
 }

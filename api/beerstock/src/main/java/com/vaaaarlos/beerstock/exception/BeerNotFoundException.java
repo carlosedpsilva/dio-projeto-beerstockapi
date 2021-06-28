@@ -1,17 +1,21 @@
 package com.vaaaarlos.beerstock.exception;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import com.vaaaarlos.beerstock.exception.meta.CustomApiException;
 
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class BeerNotFoundException extends ResponseStatusException {
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class BeerNotFoundException extends CustomApiException {
 
   public BeerNotFoundException(long id) {
-    super(NOT_FOUND, String.format("No Beer found with ID '%d'", id));
+    super(String.format("No Beer found with ID '%d'", id));
+    setStatus(HttpStatus.NOT_FOUND);
   }
 
   public BeerNotFoundException(String name) {
-    super(NOT_FOUND, String.format("No Beer found with name '%s'", name));
+    super(String.format("No Beer found with name '%s'", name));
+    setStatus(HttpStatus.NOT_FOUND);
   }
 
 

@@ -5,6 +5,8 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.vaaaarlos.beerstock.exception.meta.CustomApiException;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -33,8 +34,8 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(value = { BeerNotFoundException.class, BeerAlreadyExistsException.class })
-  public ResponseEntity<Object> handleProcessValidation(ResponseStatusException e) {
-    var apiError = new ApiError(e.getStatus().value(), e.getStatus(), e.getReason(), e.getClass().getSimpleName());
+  public ResponseEntity<Object> handleProcessValidation(CustomApiException e) {
+    var apiError = new ApiError(e.getStatus().value(), e.getStatus(), e.getLocalizedMessage(), e.getClass().getSimpleName());
     return new ResponseEntity<>(apiError, new HttpHeaders(), e.getStatus());
   }
 
